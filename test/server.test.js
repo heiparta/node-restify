@@ -7,8 +7,9 @@ var http = require('http');
 
 var filed = require('filed');
 var uuid = require('node-uuid');
+var errors = require('restify-errors');
 
-var RestError = require('../lib/errors').RestError;
+var RestError = errors.RestError;
 var restify = require('../lib');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
@@ -1081,8 +1082,9 @@ test('next.ifError', function (t) {
         process.nextTick(function () {
             var e = new RestError({
                 statusCode: 400,
-                restCode: 'Foo'
-            }, 'screw you client');
+                restCode: 'Foo',
+                message: 'screw you client'
+            });
             next.ifError(e);
             t.notOk(true);
             res.send(200);
@@ -1749,7 +1751,7 @@ test('fire event on error', function (t) {
     });
 
     SERVER.get('/', function (req, res, next) {
-        return (next(new restify.errors.InternalServerError('bah!')));
+        return (next(new errors.InternalServerError('bah!')));
     });
 
     CLIENT.get('/', function (err, _, res) {
